@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   terraform:
@@ -17,13 +16,21 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.x"
+          python-version: '3.x'
 
       - name: Install Checkov
         run: pip install checkov
 
       - name: Run Checkov scan
-        run: checkov -d .
+        run: checkov -d . --output-file-path results.sarif --output-format sarif
+
+      - name: Upload Checkov SARIF results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
+
+      # Add your Terraform deployment steps here
+
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
